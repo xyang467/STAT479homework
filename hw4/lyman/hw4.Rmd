@@ -1,0 +1,171 @@
+---
+title: "hw4"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Sherry Yang
+
+xyang467@wisc.edu
+
+### Summary
+There is 2081 data points in cB58, where FLUX is the useful variable related to my distance measure. There are 2459 data folders and each folder includes around 1000 spectrum. There spectrum may be longer than cB58, or could be less than cB58. 
+
+First, for these longer spectrum, I will need to loop like 1-2081, 2-2082, 3-2083, 4-2084 to find one-to-one match. I then use correlation as my distance measure index. A larger correlation means a better fit. Then I try to find maximum correlation within one sample spectrum.
+
+Second, shorter spectrum is what I did not notice before. For shorter spectrum, they are meaningless because they are not enough for fitting cB58. So I manually set its maximum correlation to 0.00001 to be consistent with former calculations, so it could stay in the tail of the data frame.
+
+But since we intuitively believe smaller distance is a better fit, which is inverse as the way correlation does. Thus, I decide to get the reciprocal of correlation and multiple it by 100 to make the distance measure more obvious.
+
+However, I get some strange negative distances. This is caused by negative correlations, which should stay in the tail of the data frame, but using order put negative value in the head, so I decide to remove the negative distance.
+
+Finally, I combine all sorted csv files with header together and keep only one header, and get best 100 distance.
+
+### Visualization
+```{r}
+require("FITSio")
+df = read.csv("hw4best100.csv")
+Y = readFrameFromFITS("cB58_Lyman_break.fit")$FLUX
+Y = (Y- mean(Y))/sd(Y)
+X1 = (df$i[1]):(df$i[1]+length(Y)-1)
+X2 = (df$i[2]):(df$i[2]+length(Y)-1)
+X3 = (df$i[3]):(df$i[3]+length(Y)-1)
+X4 = (df$i[4]):(df$i[4]+length(Y)-1)
+X5 = (df$i[5]):(df$i[5]+length(Y)-1)
+X6 = (df$i[6]):(df$i[6]+length(Y)-1)
+X7 = (df$i[7]):(df$i[7]+length(Y)-1)
+X8 = (df$i[8]):(df$i[8]+length(Y)-1)
+X9 = (df$i[9]):(df$i[9]+length(Y)-1)
+X10 = (df$i[10]):(df$i[10]+length(Y)-1)
+
+y1 = readFrameFromFITS(file.path(strsplit(df$spectrumID[1],"-")[[1]][2],df$spectrumID[1]))$flux
+y1 = (y1- mean(y1))/sd(y1)
+y2 = readFrameFromFITS(file.path(strsplit(df$spectrumID[2],"-")[[1]][2],df$spectrumID[2]))$flux
+y2 = (y2- mean(y2))/sd(y2)
+y3 = readFrameFromFITS(file.path(strsplit(df$spectrumID[3],"-")[[1]][2],df$spectrumID[3]))$flux
+y3 = (y3- mean(y3))/sd(y3)
+y4 = readFrameFromFITS(file.path(strsplit(df$spectrumID[4],"-")[[1]][2],df$spectrumID[4]))$flux
+y4 = (y4- mean(y4))/sd(y4)
+y5 = readFrameFromFITS(file.path(strsplit(df$spectrumID[5],"-")[[1]][2],df$spectrumID[5]))$flux
+y5 = (y5- mean(y5))/sd(y5)
+y6 = readFrameFromFITS(file.path(strsplit(df$spectrumID[6],"-")[[1]][2],df$spectrumID[6]))$flux
+y6 = (y6- mean(y6))/sd(y6)
+y7 = readFrameFromFITS(file.path(strsplit(df$spectrumID[7],"-")[[1]][2],df$spectrumID[7]))$flux
+y7 = (y7- mean(y7))/sd(y7)
+y8 = readFrameFromFITS(file.path(strsplit(df$spectrumID[8],"-")[[1]][2],df$spectrumID[8]))$flux
+y8 = (y8- mean(y8))/sd(y8)
+y9 = readFrameFromFITS(file.path(strsplit(df$spectrumID[9],"-")[[1]][2],df$spectrumID[9]))$flux
+y9 = (y9- mean(y9))/sd(y9)
+y10 = readFrameFromFITS(file.path(strsplit(df$spectrumID[10],"-")[[1]][2],df$spectrumID[10]))$flux
+y10 = (y10- mean(y10))/sd(y10)
+x1 = 1:length(y1)
+x2 = 1:length(y2)
+x3 = 1:length(y3)
+x4 = 1:length(y4)
+x5 = 1:length(y5)
+x6 = 1:length(y6)
+x7 = 1:length(y7)
+x8 = 1:length(y8)
+x9 = 1:length(y9)
+x10 = 1:length(y10)
+```
+
+
+
+```{r fig.width=7, fig.height=5}
+plot(x3, y3, type = "S", 
+     col = "blue",  xlab = "shifted wavelength
+     red shift right by 1257 to show match better", ylab = "re-scaled flux", ylim = c(-10,15), xlim = c(0,5000))
+lines(X3, Y, col = "red")
+legend("topleft", legend=c("SDSS (noisy) cB58 in spec-6052-56092-0294.fits",
+                           "cB58 (low noise) in cB58_Lyman_break_fit"),lty= c(1,1),col=c("blue","red"))
+```
+
+```{r fig.width=7, fig.height=5}
+plot(x1, y1, type = "S", 
+     col = "blue", xlab = "shifted wavelength 
+     red shift right by 448 to show match better", ylab = "re-scaled flux", ylim = c(-10,15), xlim = c(0,5000))
+lines(X1, Y,col = "red")
+legend("topleft", legend=c("SDSS (noisy) cB58 in spec-6713-56402-0294.fits",
+                           "cB58 (low noise) in cB58_Lyman_break_fit"),lty= c(1,1),col=c("blue","red"))
+```
+
+```{r fig.width=7, fig.height=5}
+plot(x5, y5, type = "S", 
+     col = "blue", xlab = "shifted wavelength 
+     red shift right by 991 to show match better", ylab = "re-scaled flux", ylim = c(-10,15), xlim = c(0,5000))
+lines(X5, Y,col = "red")
+legend("topleft", legend=c("SDSS (noisy) cB58 in spec-6303-56539-0090.fits",
+                           "cB58 (low noise) in cB58_Lyman_break_fit"),lty= c(1,1),col=c("blue","red"))
+```
+```{r fig.width=7, fig.height=5}
+plot(x2, y2, type = "S",
+     col = "blue", xlab = "shifted wavelength 
+     red shift right by 1768 to show match better", ylab = "re-scaled flux", ylim = c(-10,15), xlim = c(0,5000))
+lines(X2, Y, col = "red")
+legend("topleft", legend=c("SDSS (noisy) cB58 in spec-6489-56329-0866.fits",
+                           "cB58 (low noise) in cB58_Lyman_break_fit"),lty= c(1,1),col=c("blue","red"))
+```
+
+```{r fig.width=7, fig.height=5}
+plot(x8, y8, type = "S", 
+     col = "blue", xlab = "shifted wavelength 
+     red shift right by 2353 to show match better", ylab = "re-scaled flux", ylim = c(-10,15), xlim = c(0,5000))
+lines(X8, Y,col = "red")
+legend("topleft", legend=c("SDSS (noisy) cB58 in spec-4690-55653-0140.fits",
+                           "cB58 (low noise) in cB58_Lyman_break_fit"),lty= c(1,1),col=c("blue","red"))
+```
+
+```{r fig.width=7, fig.height=5}
+plot(x4, y4, type = "S", 
+     col = "blue", xlab = "shifted wavelength 
+     red shift right by 589 to show match better", ylab = "re-scaled flux", ylim = c(-10,15), xlim = c(0,5000))
+lines(X4, Y,col = "red")
+legend("topleft", legend=c("SDSS (noisy) cB58 in spec-5436-56015-0440.fits",
+                           "cB58 (low noise) in cB58_Lyman_break_fit"),lty= c(1,1),col=c("blue","red"))
+```
+```{r fig.width=7, fig.height=5}
+plot(x9, y9, type = "S", 
+     col = "blue", xlab = "shifted wavelength 
+     red shift right by 1126 to show match better", ylab = "re-scaled flux", ylim = c(-10,15), xlim = c(0,5000))
+lines(X9, Y,col = "red")
+legend("topleft", legend=c("SDSS (noisy) cB58 in spec-4058-55358-0100.fits",
+                           "cB58 (low noise) in cB58_Lyman_break_fit"),lty= c(1,1),col=c("blue","red"))
+```
+
+```{r fig.width=7, fig.height=5}
+plot(x10, y10, type = "S", 
+     col = "blue", xlab = "shifted wavelength 
+     red shift right by 1526 to show match better", ylab = "re-scaled flux", ylim = c(-10,15), xlim = c(0,5000))
+lines(X10, Y,col = "red")
+legend("topleft", legend=c("SDSS (noisy) cB58 in spec-5783-56017-0903.fits",
+                           "cB58 (low noise) in cB58_Lyman_break_fit"),lty= c(1,1),col=c("blue","red"))
+```
+
+```{r fig.width=7, fig.height=5}
+plot(x7, y7, type = "S", 
+     col = "blue", xlab = "shifted wavelength 
+     red shift right by 366 to show match better", ylab = "re-scaled flux", ylim = c(-10,15), xlim = c(0,5000))
+lines(X7, Y,col = "red")
+legend("topleft", legend=c("SDSS (noisy) cB58 in spec-5302-55896-0513.fits",
+                           "cB58 (low noise) in cB58_Lyman_break_fit"),lty= c(1,1),col=c("blue","red"))
+```
+
+
+
+
+
+
+
+
+```{r fig.width=7, fig.height=5}
+plot(x6, y6, type = "S", 
+     col = "blue", xlab = "shifted wavelength 
+     red shift right by 185 to show match better", ylab = "re-scaled flux", ylim = c(-10,15), xlim = c(0,5000))
+lines(X6, Y,col = "red")
+legend("topleft", legend=c("SDSS (noisy) cB58 in spec-6452-56366-0270.fits",
+                           "cB58 (low noise) in cB58_Lyman_break_fit"),lty= c(1,1),col=c("blue","red"))
+```

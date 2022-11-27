@@ -1,0 +1,84 @@
+Sherry Yang xyang467@wisc.edu
+
+
+Chengjing Gong cgong29@wisc.edu
+
+
+
+
+baby.t.test = function(x, mu=0, conf.level=.95) {
+    stopifnot(length(x) >= 2)
+    stopifnot((0 < conf.level) & (conf.level < 1))
+    n = length(x)
+    x.bar = mean(x)
+    s.x = sd(x)
+    t = (x.bar - mu) / (s.x / sqrt(n))
+    return.list = list() # set up return.list as return value
+    return.list$statistic = t
+    return.list$parameter = n - 1
+    return.list$p.value = 2*pt(q=-abs(t), df=n-1)
+    alpha = 1 - conf.level
+    t.for.conf.level = -qt(p=alpha/2, df=n-1)
+    error.margin = t.for.conf.level * s.x / sqrt(n)
+    return.list$conf.int = c(x.bar - error.margin, x.bar + error.margin)
+    return.list$estimate = x.bar
+    return.list$null.value = mu
+    return(return.list)
+}
+
+
+## test case
+baby.t = baby.t.test(1:10, 5, .90)
+print(str(baby.t))
+t = t.test(x=1:10, mu=5, conf.level=.90) # Call real t.test() to check mine.
+
+
+print("Running some tests on baby.t.test() ...")
+
+## Note: as.numeric(), below, removes names from components of t
+stopifnot(baby.t$statistic == as.numeric(t$statistic))
+stopifnot(baby.t$parameter == as.numeric(t$parameter))
+stopifnot(baby.t$p.value == as.numeric(t$p.value))
+## (The next test, and really all of these, should use all.equal()
+## rather than "==" to avoid checking floating-point numbers for
+## equality. We may correct this later after learning regular
+## expressions.)
+##stopifnot(baby.t$conf.int == as.numeric(t$conf.int))
+stopifnot(baby.t$estimate == as.numeric(t$estimate))
+stopifnot(baby.t$null.value == as.numeric(t$null.value))
+
+print("... All tests passed.")
+
+
+Four score and seven years ago our fathers brought forth on this
+continent, a new nation, conceived in Liberty, and dedicated to the
+proposition that all men are created equal.
+Now we are engaged in a great civil war, testing whether that nation,
+or any nation so conceived and so dedicated, can long endure. We are
+met on a great battle-field of that war. We have come to dedicate a
+portion of that field, as a final resting place for those who here
+gave their lives that that nation might live. It is altogether fitting
+and proper that we should do this.
+But, in a larger sense, we can not dedicate--we can not consecrate--we
+can not hallow--this ground. The brave men, living and dead, who
+struggled here, have consecrated it, far above our poor power to add
+or detract. The world will little note, nor long remember what we say
+here, but it can never forget what they did here. It is for us the
+living, rather, to be dedicated here to the unfinished work which they
+who fought here have thus far so nobly advanced. It is rather for us
+to be here dedicated to the great task remaining before us--that from
+these honored dead we take increased devotion to that cause for which
+they gave the last full measure of devotion--that we here highly
+resolve that these dead shall not have died in vain--that this nation,
+under God, shall have a new birth of freedom--and that government of
+the people, by the people, for the people, shall not perish from the
+earth.
+
+
+6789 jbrown
+9123 sroukos
+3456 chen
+8912 jjuniper
+
+
+Something interesting that emacs can do is calendaring. Emacs can help schedule your day in plain text and still get fancy notifications on mobile device with open source Org mode viewers. Once we install Org mode viewer and a Git client app on mobile, we can access agenda easily in Emacs, make updates to schedule, and stay on schedule. Changes are shown on mobile as well.

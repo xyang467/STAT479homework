@@ -1,0 +1,69 @@
+---
+title: "hw2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Sherry Yang
+
+xyang467@wisc.edu
+
+### Introduction
+There is 2081 data points in cB58, where FLUX is the useful variable related to my distance measure. All 100 sample spectrum are longer than cB58. So within one sample spectrum, I will need to find all one-to-one matchs to cB58, which all have a length of 2081. Therefore, I will need to loop like 1-2081, 2-2082, 3-2083, 4-2084, etc..
+
+With a one-to-one match, I first want to use Euclidean distance to measure the distance. In this way, I need to measure the Euclidean distance between all 2081 pairs, and may be required to sum all distances up to get one measure. However, when I look at the sampleMatch.pdf, I find out that each sample spectrum may have different brightness with each other and with cB58 given. So directly using Euclidean distance may be inaccurate without transformation, which stuck me for a moment.
+
+But later, I started thinking that because they are of different brightness, the most important thing for fitting is the trend. In order to fit the trend, I came up with using correlation to get my distance measure index. Following the one-to-one match mentioned in the first paragraph, I could use cor() function to easily get one measure for one match. Since larger correlation means a better fit, I tried to find the maximum correlation within one sample spectrum and starting point for this best match. But for distance, we intuitively believe smaller distance is a better fit, which is inverse as the way correlation does. Therefore, I decide to get the reciprocal of correlation and multiple it by 100 to make the distance measure more obvious. 
+
+For each sample spectrum, I would do the same thing to find the smallest distance measure within a spectrum, so I need to loop over 100 times to get all smallest distance measure for each sample spectrum, which is wrapped outside all the process mentioned above.
+
+### Visualization
+```{r}
+require("FITSio")
+df = read.csv("hw2.csv")
+Y = readFrameFromFITS("cB58_Lyman_break.fit")$FLUX
+Y = (Y- mean(Y))/sd(Y)
+X1 = (df$i[1]):(df$i[1]+length(Y)-1)
+X2 = (df$i[2]):(df$i[2]+length(Y)-1)
+X3 = (df$i[3]):(df$i[3]+length(Y)-1)
+
+y1 = readFrameFromFITS(file.path("data",df$spectrumID[1]))$flux
+y1 = (y1- mean(y1))/sd(y1)
+y2 = readFrameFromFITS(file.path("data",df$spectrumID[2]))$flux
+y2 = (y2- mean(y2))/sd(y2)
+y3 = readFrameFromFITS(file.path("data",df$spectrumID[3]))$flux
+y3 = (y3- mean(y3))/sd(y3)
+x1 = 1:length(y1)
+x2 = 1:length(y2)
+x3 = 1:length(y3)
+```
+
+```{r fig.width=7, fig.height=5}
+plot(x1, y1, type = "S", 
+     col = "blue", xlab = "shifted wavelength 
+     red shift right by 905 to show match better", ylab = "re-scaled flux", ylim = c(-10,15), xlim = c(0,5000))
+lines(X1, Y,col = "red")
+legend("topleft", legend=c("SDSS (noisy) cB58 in spec-5328-55982-0218.fits",
+                           "cB58 (low noise) in cB58_Lyman_break_fit"),lty= c(1,1),col=c("blue","red"))
+```
+
+```{r fig.width=7, fig.height=5}
+plot(x2, y2, type = "S",
+     col = "blue", xlab = "shifted wavelength 
+     red shift right by 827 to show match better", ylab = "re-scaled flux", ylim = c(-10,15), xlim = c(0,5000))
+lines(X2, Y, col = "red")
+legend("topleft", legend=c("SDSS (noisy) cB58 in spec-5324-55947-0886.fits",
+                           "cB58 (low noise) in cB58_Lyman_break_fit"),lty= c(1,1),col=c("blue","red"))
+```
+
+```{r fig.width=7, fig.height=5}
+plot(x3, y3, type = "S", 
+     col = "blue",  xlab = "shifted wavelength
+     red shift right by 519 to show match better", ylab = "re-scaled flux", ylim = c(-10,15), xlim = c(0,4000))
+lines(X3, Y, col = "red")
+legend("topleft", legend=c("SDSS (noisy) cB58 in spec-1353-53083-0579.fits",
+                           "cB58 (low noise) in cB58_Lyman_break_fit"),lty= c(1,1),col=c("blue","red"))
+```

@@ -1,0 +1,5 @@
+df = read.csv("allMSN.csv",header = F)
+delay = as.numeric(df[which(is.na(df[,2]) == F),2])
+day = factor(df[which(is.na(df[,2]) == F),1])
+levels(day) = c("Mo","Tu","We","Th","Fr","Sa","Su")
+round(tapply(delay, day, mean),1)

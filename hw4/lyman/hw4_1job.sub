@@ -1,0 +1,18 @@
+universe = vanilla
+
+log    =    log/hw4_1job_$(number).log
+error  =  error/hw4_1job_$(number).err
+output = output/hw4_1job_$(number).out
+
+executable = ./hw4.sh
+arguments = cB58_Lyman_break.fit $(number)
+
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+transfer_input_files = http://proxy.chtc.wisc.edu/SQUID/chtc/R402.tar.gz, hw4.R, /home/groups/STAT605/boss/cB58_Lyman_break.fit, packages_FITSio.tar.gz, /home/groups/STAT605/boss/tgz/$(number).tgz
+
+request_cpus = 1
+request_memory = 150MB
+request_disk = 550MB
+
+queue number from list1
